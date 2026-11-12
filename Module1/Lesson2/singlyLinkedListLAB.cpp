@@ -23,14 +23,16 @@ public:
   ~List();
   void push_front(int value);
   bool pop_front(int &value);
+  void push_back(int value);
   int size();
 
 private:
   Node *head;
+  Node* tail;
   int listSize;
 };
 
-List::List() : head(nullptr) {
+List::List() : head(nullptr), tail(nullptr) {
     listSize = 0;
 }
 
@@ -66,20 +68,33 @@ int List::size(){
     return listSize;
 }
 
+void List::push_back(int value)
+{
+  Node *new_tail = new Node(value);
+  if (tail == nullptr) {
+    head = new_tail;
+    tail = new_tail;
+  }
+  else {
+    tail->next = new_tail;
+    tail = new_tail;
+  }
+  listSize += 1;
+}
+
 int main()
 {
   List list;
-  for (int i = 0; i <= 5; i++)
+  //
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  list.push_back(4);
+
+  int value = 0;
+  while (list.pop_front(value))
   {
-    list.push_front(i);
-    cout << "pushed " << i << ", size: " << list.size() << endl;
-  }
-  cout << endl;
-  for (int i = 0; i < 3; i++)
-  {
-    int value;
-    list.pop_front(value);
-    cout << "popped " << value << ", size: " << list.size() << endl;
+    cout << value << endl;
   }
   return 0;
 }
