@@ -7,6 +7,8 @@ public:
   Point2D(double x, double y);
   string toString();
   double distanceTo(Point2D that);
+  double get_x() {return x;}
+  double get_y() { return y;}
 private:
   double x;
   double y;
@@ -26,6 +28,25 @@ string Point2D::toString(){
     return "(" + to_string(this->x) + ", " + to_string(this->y) + ")";
 }
 
+class Line2D{
+public:
+  Line2D(double slope, double y_intercept);
+  Line2D(Point2D pointA, Point2D pointB);
+  string toString();
+private:
+  double slope;
+  double y_intercept;
+};
+
+Line2D::Line2D(Point2D pointA, Point2D pointB){
+    this->slope = (pointB.get_y() - pointA.get_y()) / (pointB.get_x() - pointA.get_x());
+    this->y_intercept = pointA.get_y() - this->slope * pointA.get_x();
+}
+
+string Line2D::toString(){
+    return "y = " + to_string(this->slope) + "x + " + to_string(this->y_intercept);
+}
+
 
 int main(void){
     //get first point
@@ -42,8 +63,8 @@ int main(void){
     sscanf(input2.c_str(), "%lf %lf", &x2, &y2);
     Point2D point2(x2, y2);
 
-    //print distance
-    cout << point1.toString() << " - " << point2.toString() << " = " << point1.distanceTo(point2) << endl;
+    Line2D line(point1, point2);
+    cout << line.toString() << endl;
 
     return 0;
 }
