@@ -1,65 +1,75 @@
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
-class FarmAnimal{
+class FarmAnimal {
 public:
-  FarmAnimal(double water_consumption);
-  double getWaterConsumption();
-  // ...
+  virtual double getWaterConsumption() = 0;
+};
+
+class SheepAnimal : public FarmAnimal {
+public:
+  SheepAnimal(double weight) : weight(weight) {}
+  virtual double getWaterConsumption() override {
+    return weight / 10*1.1;
+  }
+
 private:
-  double water_consumption;
+  double weight;
 };
 
-FarmAnimal::FarmAnimal(double water_consumption) {
-  this->water_consumption = water_consumption;
-}
-
-double FarmAnimal::getWaterConsumption() {
-  return water_consumption;
-}
-
-
-class DummyAnimal : public FarmAnimal{
+class HorseAnimal : public FarmAnimal {
 public:
-  DummyAnimal();
+  HorseAnimal(double weight) : weight(weight) {}
+  virtual double getWaterConsumption() override {
+    return weight / 100*6.8;
+  }
+
+private:
+  double weight;
 };
 
-DummyAnimal::DummyAnimal() : FarmAnimal(10.0)
-{
-
-}
-
-
-class DoublingAnimal : public FarmAnimal
-{
+class CowAnimal : public FarmAnimal {
 public:
-  DoublingAnimal(double given_water_consumption);
+  CowAnimal(double weight) : weight(weight) {}
+  virtual double getWaterConsumption() override {
+    return weight / 100*8.6;
+  };
+
+private:
+  double weight;
 };
 
-DoublingAnimal::DoublingAnimal(double given_water_consumption)
-: FarmAnimal(2 * given_water_consumption) {
 
-}
-
-void printConsumption(FarmAnimal &animal)
-{
+void printConsumption(FarmAnimal &animal) {
   cout << "This animal consumes " << animal.getWaterConsumption()
        << " liters of water" << endl;
 }
 
-int main()
-{
-  FarmAnimal animalA(5);
-  DummyAnimal animalB;
-  DoublingAnimal animalC(21);
+int main() {
+    string input;
+    double totalWaterConsumption = 0.0;
 
-  cout << "animalA consumes " << animalA.getWaterConsumption()
-       << " liters of water." << endl;
-  cout << "What about the others?" << endl;
+    while (getline(cin, input) && !input.empty()) {
+        string animal;
+        double weight;
+        istringstream iss(input);
+        iss >> animal >> weight;
 
-  printConsumption(animalB);
-  printConsumption(animalC);
+        if (animal == "cow") {
+            CowAnimal cow(weight);
+            totalWaterConsumption += cow.getWaterConsumption();
+        } else if (animal == "sheep") {
+            SheepAnimal sheep(weight);
+            totalWaterConsumption += sheep.getWaterConsumption();
+        } else if (animal == "horse") {
+            HorseAnimal horse(weight);
+            totalWaterConsumption += horse.getWaterConsumption();
+        }
+    }
 
-  return 0;
+    cout << totalWaterConsumption << endl;
+
+    return 0;
 }
