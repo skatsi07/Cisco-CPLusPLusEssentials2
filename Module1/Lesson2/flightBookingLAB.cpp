@@ -1,102 +1,205 @@
 #include <iostream>
-
-using namespace std;
+#include <string>
+#include <stdio.h>
 
 class FlightBooking {
 public:
-  FlightBooking(int id, int capacity, int reserved);
+  FlightBooking(int id = 0, int capacity = 0, int reserved = 0);
   void printStatus();
   bool reserveSeats(int number_of_seats);
   bool cancelReservations(int number_of_seats);
-  double getPercentageBooked() {return ((double)reserved/capacity) * 100;};
+  int  get_id() { return id; }
 private:
   int id;
   int capacity;
   int reserved;
-  double percentageBooked;
 };
-
-void FlightBooking::printStatus()
-{
-  cout << "Flight " << id << " : " << reserved << "/" << capacity << " (" << percentageBooked << "%) seats reserved" << endl;
-}
 
 FlightBooking::FlightBooking(int id, int capacity, int reserved)
 {
-  this->id = id;
-  this->capacity = capacity;
-  this->reserved = reserved;
-  this->percentageBooked = getPercentageBooked();
-
-  //check to make sure percenatge booked is not over 105%
-  if (percentageBooked > 105){
-    reserved = capacity * 1.05;
-    this -> percentageBooked = 105;
+  // Save data to members according to limits
+  this->id       = id;
+  this->capacity = (capacity > 0) ? capacity : 0;
+  this->reserved = (reserved > 0) ? reserved : 0;
+  if ((100 * this->reserved) > ( 105 * this->capacity))
+  {
+    this->reserved = (105 * this->capacity) / 100;
   }
 }
 
 bool FlightBooking::reserveSeats(int number_of_seats)
 {
   // try to add reservations and return 'true' on success
-  // keep the limits in mind
-  
-  if ((reserved + number_of_seats)*100 > (capacity*105)){
-    cout << "Cannot perform this operation";
+  if (number_of_seats <= 0 || (100 * (reserved + number_of_seats)) > ( 105 * capacity))
+  {
     return false;
   }
+  reserved += number_of_seats;
 
-  this -> reserved += number_of_seats;
   return true;
 }
 
 bool FlightBooking::cancelReservations(int number_of_seats)
 {
-  // try to cancel reservations and return 'true' on success
-  // keep the limits in mind
-  if (number_of_seats > reserved){
-    cout << "Cannot perform this operation" << endl;
+  // try to canel reservations and return 'true' on success
+  if (number_of_seats <= 0  || reserved < number_of_seats)
+  {
     return false;
   }
-  this -> reserved -= number_of_seats;
+  reserved -= number_of_seats;
+
   return true;
 }
 
+void FlightBooking::printStatus()
+{
+  if (id != 0)
+  {
+    std::cout << "Flight " << id << " : " << reserved << '/'
+       << capacity << " (" << (100 * reserved) / capacity << "%) seats reserved" << std::endl;
+  }
+}
+
+const int MAX_BOOKINGS = 10;
+
 int main() {
-  int reserved = 0,
-      capacity = 0;
-  std::cout << "Provide flight capacity: ";
-  std::cin >> capacity;
-
-  std::cout << "Provide number of reserved seats: ";
-  std::cin >> reserved;
-
-  FlightBooking booking(1, capacity, reserved);
+  // max bookings allowed 10
+  FlightBooking bookings[MAX_BOOKINGS];
 
   std::string command = "";
   while (command != "quit")
   {
-    booking.printStatus();
+    // check if there are any flights in the system
+    int seats  = 0;
+    int id     = 0;
+    bool command_known = false;
+    bool command_ok    = false;
+    bool any_flight_valid = false;
+    std::string error = "";
+    for (int idx = 0; idx < MAX_BOOKINGS; ++idx)
+    {
+      if (bookings[idx].get_id() != 0)
+      {
+        any_flight_valid = true;
+      }
+      bookings[idx].printStatus();
+    }
+    if (!any_flight_valid)
+    {
+      std::cout << "No flights in the system" << std::endl;
+    }
+
+
     std::cout << "What would you like to do?: ";
-    std::getline(cin, command);
-
-    // if "add [n]" add n reservations to flight
-    if (command.find("add") == 0)
+    command = "";
+    while (command == "")
     {
-      int number_of_seats = stoi(command.substr(4));
-      booking.reserveSeats(number_of_seats);
+      std::getline(std::cin, command);
     }
 
-    // if "cancel [n]" cancel n reservations from flight
-    else if (command.find("cancel") == 0)
+    if (command == "quit")
     {
-      int number_of_seats = stoi(command.substr(7));
-      booking.cancelReservations(number_of_seats);
+      command_known = true;
+      command_ok    = true;
     }
 
-    // if "quit" exit the program
-    else if (command == "quit")
+    // if command is add add new flight with id to array of flights
+    if (2 == sscanf(command.c_str(), "add %d %d", &id, &seats))
     {
-      break;
+      command_known = true;
+      if (id != 0)
+      {
+        int idx = 0;
+        while (idx < MAX_BOOKINGS && bookings[idx].get_id() != id) { idx++; }
+        if (idx < MAX_BOOKINGS)
+        {
+          command_ok = bookings[idx].reserveSeats(seats);
+          if (!command_ok)
+          {
+            error = "capacity reached";
+          }
+        }
+        else
+        {
+          error = std::string("flight ") + std::to_string(id) + " not found";
+        }
+
+      }
+    }
+    // if command is cancel reserve number of seats from a flight with id 
+    else if (2 == sscanf(command.c_str(), "cancel %d %d", &id, &seats))
+    {
+      command_known = true;
+      if (id != 0)
+      {
+        int idx = 0;
+        while (idx < MAX_BOOKINGS && bookings[idx].get_id() != id) { idx++; }
+        if (idx < MAX_BOOKINGS)
+        {
+          command_ok = bookings[idx].cancelReservations(seats);
+          if (!command_ok)
+          {
+            error = "not enough reservations";
+          }
+        }
+        else
+        {
+          error = std::string("flight ") + std::to_string(id) + " not found";
+        }
+      }
+    }
+    //if you want to add a new flight with id create flight id capacity
+    else if (2 == sscanf(command.c_str(), "create %d %d", &id, &seats))
+    {
+      command_known = true;
+      if (id != 0)
+      {
+        int idx = 0;
+        while (idx < MAX_BOOKINGS && bookings[idx].get_id() != id) { idx++; }
+        if (idx < MAX_BOOKINGS)
+        {
+          // id taken
+          error = std::string("flight ") + std::to_string(id) + " already exists";
+        }
+        else
+        {
+          idx = 0;
+          while (idx < MAX_BOOKINGS && bookings[idx].get_id() != 0) { idx++; }
+          if (idx < MAX_BOOKINGS && id != 0)
+          {
+            bookings[idx] = FlightBooking(id, seats);
+            command_ok = true;
+          }
+        }
+      }
+    }
+    //if you want to delete a flight with particular id 
+    else if (1 == sscanf(command.c_str(), "delete %d", &id))
+    {
+      command_known = true;
+      if (id != 0)
+      {
+        int idx = 0;
+        while (idx < MAX_BOOKINGS && bookings[idx].get_id() != id) { idx++; }
+        if (idx < MAX_BOOKINGS)
+        {
+          bookings[idx] = FlightBooking();
+          command_ok = true;
+        }
+        else
+        {
+          error = std::string("flight ") + std::to_string(id) + " not found";
+        }
+      }
+    }
+
+    if (command_known && !command_ok)
+    {
+      std::cout << "Cannot perform this operation: " << error << std::endl;
+    }
+    if (!command_known)
+    {
+      std::cout << "Unknown command" << std::endl;
     }
   }
 
