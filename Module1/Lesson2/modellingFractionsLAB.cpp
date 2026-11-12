@@ -15,6 +15,10 @@ public:
   Fraction times(Fraction that);
   Fraction by(Fraction that);
 
+  bool isGreaterThan(Fraction that);
+  bool isLessThan(Fraction that);
+  bool isEqual(Fraction that);
+
 private:
   int numerator;
   int denominator;
@@ -85,6 +89,24 @@ string Fraction::toString() {
 
 double Fraction::toDouble() { return (double)numerator / denominator; }
 
+bool Fraction::isGreaterThan(Fraction that) {
+    reduce();
+    that.reduce();
+    return this->toDouble() > that.toDouble();
+}
+
+bool Fraction::isLessThan(Fraction that) {
+    reduce();
+    that.reduce();
+    return this->toDouble() < that.toDouble();
+}
+
+bool Fraction::isEqual(Fraction that) {
+    reduce();
+    that.reduce();
+    return this->toDouble() == that.toDouble();
+}
+
 int main(void) {
 
   // get first fraction
@@ -116,14 +138,18 @@ int main(void) {
   Fraction fraction2(num2, den2);
 
   // print results
-  cout << fraction1.toString() << " + " << fraction2.toString() << " = "
-       << fraction1.plus(fraction2).toString() << endl;
-  cout << fraction1.toString() << " - " << fraction2.toString() << " = "
-       << fraction1.minus(fraction2).toString() << endl;
-  cout << fraction1.toString() << " * " << fraction2.toString() << " = "
-       << fraction1.times(fraction2).toString() << endl;
-  cout << fraction1.toString() << " / " << fraction2.toString() << " = "
-       << fraction1.by(fraction2).toString() << endl;
+  if (fraction1.isGreaterThan(fraction2))
+  {
+    cout << fraction1.toString() << " > " << fraction2.toString() << endl;
+  }
+  if (fraction1.isLessThan(fraction2))
+  {
+    cout << fraction1.toString() << " < " << fraction2.toString() << endl;
+  }
+  if (fraction1.isEqual(fraction2))
+  {
+    cout << fraction1.toString() << " = " << fraction2.toString() << endl;
+  }
 
-  return 0;
+	return 0;
 }
