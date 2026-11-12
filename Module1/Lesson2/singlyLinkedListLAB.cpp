@@ -18,6 +18,7 @@ class List {
 public:
   List();
   ~List();
+  List(List &other);
   void push_front(int value);
   bool pop_front(int &value);
   void push_back(int value);
@@ -34,6 +35,15 @@ private:
 };
 
 List::List() : head(nullptr), tail(nullptr) { listSize = 0; }
+
+List::List(List &other): List()
+{
+  Node* node = other.head;
+  while (node != nullptr) {
+    push_back(node->value);
+    node = node->next;
+  }
+}
 
 List::~List() {
   while (head != nullptr) {
@@ -169,21 +179,28 @@ void printList(List &list)
 
 int main()
 {
-  List list;
-  //
-  list.push_front(1);
-  list.push_front(2);
-  list.push_front(3);
-  list.push_front(4);
-  printList(list);
+  List list1;
+  list1.push_front(1);
+  list1.push_front(2);
+  list1.push_front(3);
+  list1.push_front(4);
+  cout << "list1" << endl;
+  printList(list1);
   cout << endl;
 
-  list.remove_at(2);
-  printList(list);
+  List list2(list1);
+  cout << "list2" << endl;
+  printList(list2);
   cout << endl;
 
-  list.insert_at(1, 6);
-  printList(list);
+  list1.insert_at(1, 6);
+  list2.remove_at(2);
+
+  cout << "list1" << endl;
+  printList(list1);
+  cout << "list2" << endl;
+  printList(list2);
+  cout << endl;
 
   return 0;
 }
