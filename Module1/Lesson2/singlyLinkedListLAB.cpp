@@ -22,6 +22,9 @@ public:
   bool pop_front(int &value);
   void push_back(int value);
   bool pop_back(int &value);
+  int  at(int index);
+  void insert_at(int index, int value);
+  void remove_at(int index);
   int size();
 
 private:
@@ -106,17 +109,81 @@ bool List::pop_back(int &value) {
   return false;
 }
 
-int main() {
+//returns value at that index
+int List::at(int index){
+    if (index + 1 <= listSize && index >= 0)
+    {
+        Node* node = head;
+        for (int i = 0; i < index; i++)
+        {
+            node = node->next;
+        }
+        return node->value;
+    }
+}
+
+//insert value at index
+void List::insert_at(int index, int value){
+    if (index + 1 <= listSize && index >= 0)
+    {
+        Node* node = head;
+        for (int i = 0; i < index-1; i++)
+        {
+            node = node->next;
+        }
+        //set prev node to new node
+        // and new node next to exisiting next node
+        Node* new_node = new Node(value);
+        new_node->next = node->next;
+        node->next = new_node;
+        listSize += 1;
+    }
+    
+}
+
+//remove node at index without returning it
+void List::remove_at(int index){
+    if (index + 1 <= listSize && index >= 0)
+    {
+        Node* prev = head;
+        for (int i = 0; i < index - 1; i++)
+        {
+            prev = prev->next;
+        }
+        //set prev node to next next node
+        // and new node next to exisiting next node
+        Node* target = prev->next;
+        prev -> next = target -> next;
+        delete target;
+        listSize -= 1;
+    }
+}
+
+void printList(List &list)
+{
+  for (int i = 0; i < list.size(); i++)
+  {
+    cout << "list[" << i << "] == " << list.at(i) << endl;
+  }
+}
+
+int main()
+{
   List list;
   //
   list.push_front(1);
   list.push_front(2);
   list.push_front(3);
   list.push_front(4);
+  printList(list);
+  cout << endl;
 
-  int value = 0;
-  while (list.pop_back(value)) {
-    cout << value << endl;
-  }
+  list.remove_at(2);
+  printList(list);
+  cout << endl;
+
+  list.insert_at(1, 6);
+  printList(list);
+
   return 0;
 }
