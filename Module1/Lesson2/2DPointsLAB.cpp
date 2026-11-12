@@ -33,6 +33,7 @@ public:
   Line2D(double slope, double y_intercept);
   Line2D(Point2D pointA, Point2D pointB);
   string toString();
+  string contains(Point2D point);
 private:
   double slope;
   double y_intercept;
@@ -45,6 +46,13 @@ Line2D::Line2D(Point2D pointA, Point2D pointB){
 
 string Line2D::toString(){
     return "y = " + to_string(this->slope) + "x + " + to_string(this->y_intercept);
+}
+
+string Line2D::contains(Point2D point){
+    if (point.get_y() == this->slope * point.get_x() + this->y_intercept){
+        return "collinear";
+    }
+    return "not collinear";
 }
 
 
@@ -64,7 +72,15 @@ int main(void){
     Point2D point2(x2, y2);
 
     Line2D line(point1, point2);
-    cout << line.toString() << endl;
+
+    //get third point
+    string input3 = "";
+    getline(cin, input3);
+    double x3, y3;
+    sscanf(input3.c_str(), "%lf %lf", &x3, &y3);
+    Point2D point3(x3, y3);
+
+    cout << line.contains(point3);
 
     return 0;
 }
