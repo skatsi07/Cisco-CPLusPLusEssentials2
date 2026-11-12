@@ -5,15 +5,24 @@ using namespace std;
 class Node {
 public:
   Node(int val);
+  ~Node();
   int value;
   Node *next;
 };
 
-Node::Node(int val) : value(val), next(nullptr) {}
+Node::Node(int val) : value(val), next(nullptr) {
+    cout << "+Node" << endl;
+}
+
+Node::~Node()
+{
+  cout << "-Node" << endl;
+}
 
 class List {
 public:
   List();
+  ~List();
   void push_front(int value);
   bool pop_front(int &value);
 
@@ -22,6 +31,15 @@ private:
 };
 
 List::List() : head(nullptr) {}
+
+List::~List()
+{
+  while (head != nullptr) {
+    Node* n = head;
+    head = head->next;
+    delete n;
+  }
+}
 
 void List::push_front(int value) {
   Node *new_head = new Node(value);
