@@ -36,7 +36,7 @@ Matrix::Matrix(int rows, int cols) {
 Matrix Matrix::add(const Matrix &other) const {
   Matrix result(rows, cols);
   if (rows != other.rows || cols != other.cols) {
-    cout << "Dimensions are not the same" << endl;
+    cout << "Exception: Matrix sixes do not match for addition" << endl;
     return result;
   }
 
@@ -60,7 +60,7 @@ Matrix Matrix::addToAll(int num) const {
 
 Matrix Matrix::substract(const Matrix &other) const {
   if (rows != other.rows || cols != other.cols) {
-    cout << "Dimensions are not the same" << endl;
+    cout << "Exception: Matrix sixes do not match for subtraction" << endl;
     return Matrix(rows, cols);
   }
   Matrix result(rows, cols);
@@ -84,7 +84,7 @@ Matrix Matrix::subtractFromAll(int num) const {
 
 Matrix Matrix::multiply(const Matrix &other) const {
   if (cols != other.rows) {
-    cout << "Dimensions are not compatible for multiplication" << endl;
+    cout << "Exception: Matrix sixes do not match for multiplication" << endl;
     return Matrix(rows, other.cols);
   }
 
